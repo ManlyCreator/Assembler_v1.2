@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/rami/CProjects/Assembler_v1.2/build",
+  "command": "/usr/bin/cc  -I/home/rami/CProjects/Assembler_v1.2/Opcodes/include -I/home/rami/CProjects/Assembler_v1.2/SymbolTable/include  -o CMakeFiles/Assembler.dir/main.c.o -c /home/rami/CProjects/Assembler_v1.2/main.c",
+  "file": "/home/rami/CProjects/Assembler_v1.2/main.c",
+  "output": "CMakeFiles/Assembler.dir/main.c.o"
+},
+{
+  "directory": "/home/rami/CProjects/Assembler_v1.2/build/Opcodes",
+  "command": "/usr/bin/cc  -I/home/rami/CProjects/Assembler_v1.2/Opcodes/include  -o CMakeFiles/Opcodes.dir/src/opcodes.c.o -c /home/rami/CProjects/Assembler_v1.2/Opcodes/src/opcodes.c",
+  "file": "/home/rami/CProjects/Assembler_v1.2/Opcodes/src/opcodes.c",
+  "output": "Opcodes/CMakeFiles/Opcodes.dir/src/opcodes.c.o"
+},
+{
+  "directory": "/home/rami/CProjects/Assembler_v1.2/build/SymbolTable",
+  "command": "/usr/bin/cc  -I/home/rami/CProjects/Assembler_v1.2/SymbolTable/include  -o CMakeFiles/SymbolTable.dir/src/symbolTable.c.o -c /home/rami/CProjects/Assembler_v1.2/SymbolTable/src/symbolTable.c",
+  "file": "/home/rami/CProjects/Assembler_v1.2/SymbolTable/src/symbolTable.c",
+  "output": "SymbolTable/CMakeFiles/SymbolTable.dir/src/symbolTable.c.o"
+}
+]

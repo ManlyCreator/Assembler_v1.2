@@ -1,0 +1,9 @@
+/home/rami/CProjects/Assembler_v1.2/build/CMakeFiles/Assembler.dir
+/home/rami/CProjects/Assembler_v1.2/build/CMakeFiles/edit_cache.dir
+/home/rami/CProjects/Assembler_v1.2/build/CMakeFiles/rebuild_cache.dir
+/home/rami/CProjects/Assembler_v1.2/build/Opcodes/CMakeFiles/Opcodes.dir
+/home/rami/CProjects/Assembler_v1.2/build/Opcodes/CMakeFiles/edit_cache.dir
+/home/rami/CProjects/Assembler_v1.2/build/Opcodes/CMakeFiles/rebuild_cache.dir
+/home/rami/CProjects/Assembler_v1.2/build/SymbolTable/CMakeFiles/SymbolTable.dir
+/home/rami/CProjects/Assembler_v1.2/build/SymbolTable/CMakeFiles/edit_cache.dir
+/home/rami/CProjects/Assembler_v1.2/build/SymbolTable/CMakeFiles/rebuild_cache.dir

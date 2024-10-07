@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSymbolTable.a CMakeFiles/SymbolTable.dir/src/symbolTable.c.o
+/usr/bin/ranlib libSymbolTable.a

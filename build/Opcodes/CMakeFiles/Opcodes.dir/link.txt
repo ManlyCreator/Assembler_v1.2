@@ -1,0 +1,2 @@
+/usr/bin/ar qc libOpcodes.a CMakeFiles/Opcodes.dir/src/opcodes.c.o
+/usr/bin/ranlib libOpcodes.a

@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/Assembler.dir/main.c.o -o Assembler  Opcodes/libOpcodes.a SymbolTable/libSymbolTable.a 
