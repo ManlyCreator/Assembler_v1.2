@@ -7,8 +7,8 @@
 
 #define BUFSIZE 256
 
-// TODO: Debug A-Instruction handling causing stack smashing
-// TODO: Free linked list as the second pass is occurring
+// TODO: Fix all memory leaks 
+// (alwyas 264 bytes, must be somewhere specific)
 
 typedef struct node {
   char line[BUFSIZE]; 
@@ -17,13 +17,11 @@ typedef struct node {
 
 void strip(char* line);
 void insertNode(node* listPtr, node* n);
-char* handleA_Instruction(char* line);
-char* toBinary(char* decimalString);
-char* handleC_Instruction(char* line);
+void handleA_Instruction(char* line, char* aInstruction);
+void toBinary(char* decimalString);
+void handleC_Instruction(char* line, char* cInstruction);
 
 int symbolCounter = 16;
-
-// TODO: Create a function which takes the line as input and strips it of whitespace
 
 int main(int argc, char** argv) { 
   // Opens source file provided through CLI
@@ -41,8 +39,8 @@ int main(int argc, char** argv) {
     filename[i] = argv[1][i];
     i++;
   }
+  filename[i] = '\0';
   strcat(filename, ".hack");
-  filename[strlen(filename)] = '\0';
 
   // Creates the destination file
   remove(filename);
@@ -52,13 +50,17 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  char* lineBuf = malloc(BUFSIZE);
+  char lineBuf[BUFSIZE];
   // Initializes linked list of stripped file lines
   node* head = malloc(sizeof(node));
   node* listPtr = head;
   int lineCtr = 0;
   while (fgets(lineBuf, BUFSIZE, source)) {
     strip(lineBuf);
+    // Skips lineBuf if it is not an instruction
+    if (isspace(lineBuf[0]) || lineBuf[0] == '\n' || lineBuf[0] == '/') {
+      continue;
+    }
     node* lineNode = malloc(sizeof(node));
     strcpy(lineNode->line, lineBuf);
     lineNode->next = NULL;
@@ -68,7 +70,7 @@ int main(int argc, char** argv) {
     }
     lineCtr++;
   }
-  
+
   // First pass to handle label parsing
   int instruction = 0;
   node* iterator = head;
@@ -77,50 +79,38 @@ int main(int argc, char** argv) {
     if (!isspace(line[0]) && line[0] != '\n' && line[0] != '/' && line[0] != '(') {
       instruction++;
     } else if (line[0] == '(') {
-      // label is static for the lifetime of this loop, therefore a malloc'd variable must be used so that
-      // name values do not change across iterations
-      char* labelNameDest = malloc(BUFSIZE);
-      char labelNameSource[BUFSIZE];
+      char labelName[BUFSIZE];
       // Stores the label
       int i = 1;
       while (line[i] != ')') {
-        labelNameSource[i - 1] = line[i];
+        labelName[i - 1] = line[i];
         i++;
       }
-      labelNameSource[i - 1] = '\0';
-      strcpy(labelNameDest, labelNameSource);
-      createSymbol(labelNameDest, instruction);
-      free(labelNameDest);
+      labelName[i - 1] = '\0';
+      createSymbol(labelName, instruction);
     }
     iterator = iterator->next;
   }
-  printf("First Pass Complete\n");
   // Second pass to handle instruction translating and variables
   iterator = head;
   while (iterator != NULL) {
     char* line = iterator->line;
-    printf("%s\n", line);
-    // Handles whitespace, comments, and labels
-    if (isspace(line[0]) || line[0] == '\n' || line[0] == '/' || line[0] == '(') {
-      printf("Skipping\n");
-      iterator = iterator->next;
-      continue;
+    char instruction[17];
+    // Translates instructions that are not labels
+    if (line[0] != '(') {
+      // Checks for A-Instructions
+      if (line[0] == '@') {
+        handleA_Instruction(line, instruction);
+        fprintf(destination, "%s\n", instruction);
+      } else {
+        // char* cInstruction = handleC_Instruction(line);
+        handleC_Instruction(line, instruction);
+        fprintf(destination, "%s\n", instruction);
+      }
     }
-    // Checks for A-Instructions
-    if (line[0] == '@') {
-      printf("Handling A-Instruction\n");
-      char* aInstruction = handleA_Instruction(line);
-      printf("A-Instruction Handled\n");
-      fprintf(destination, "%s\n", aInstruction);
-      printf("Instruction Printed\n");
-      free(aInstruction);
-    } else {
-      char* cInstruction = handleC_Instruction(line);
-      fprintf(destination, "%s\n", cInstruction);
-      free(cInstruction);
-    }
-    printf("Going to Next Line\n");
+    node* iteratorCopy = iterator;
     iterator = iterator->next;
+    free(iteratorCopy);
   }
 
   fclose(source);
@@ -167,23 +157,17 @@ void insertNode(node* listPtr, node* n) {
   }
 }
 
-char* handleA_Instruction(char* line) {
-  char* aInstruction = malloc(17);
+void handleA_Instruction(char* line, char* aInstruction) {
   char a[BUFSIZE];
   int i = 1;
   int isSymbol = 0;
   // Copies everything after the '@' to a until an invalid character is detected
-  if (isdigit(line[1])) {
-    while (isdigit(line[i])) {
-      a[i - 1] = line[i];
-      i++;
-    }
-  } else {
+  if (!isdigit(line[1])) {
     isSymbol = 1;
-    while (!isspace(line[i]) && line[i] != '\n' && line[i] != '/') {
-      a[i - 1] = line[i];
-      i++;
-    }
+  }
+  while (i - 1 < strlen(line) - 1) {
+    a[i - 1] = line[i];
+    i++;
   }
   // Null terminates a  
   a[i - 1] = '\0';
@@ -198,21 +182,14 @@ char* handleA_Instruction(char* line) {
     }
     getSymbolValue(a);
   }
-  char* tempAInstruction = toBinary(a);
-  printf("To Binary\n");
-  strcpy(aInstruction, tempAInstruction);
-  printf("Copied\n");
-  free(tempAInstruction);
-  printf("A-Instruction: %s\n", aInstruction);
-  printf("Length: %lu\n", strlen(aInstruction));
-  printf("Freed\n");
-  return aInstruction;
+  toBinary(a);
+  strcpy(aInstruction, a);
 }
 
-char* toBinary(char* decimalString) {
+void toBinary(char* decimalString) {
   // Segmentation fault when writing directly to binaryString,
   // so a second string is declared to write back to binaryString
-  char* binaryString = malloc(17);
+  // char* binaryString = malloc(17);
   char binaryStringCopy[] = "0000000000000000";
   int n = atoi(decimalString);
   int rem = 0;
@@ -223,14 +200,12 @@ char* toBinary(char* decimalString) {
     binaryStringCopy[bit] = rem + '0';
     bit--;
   }
-  strcpy(binaryString, binaryStringCopy);
-  return binaryString;
+  strcpy(decimalString, binaryStringCopy);
 }
 
-char* handleC_Instruction(char* line) {
-  char* cInstruction = malloc(17);
-  char comp[10]; 
-  char jmp[10];
+void handleC_Instruction(char* line, char* cInstruction) {
+  char comp[4]; 
+  char jmp[5];
   char destCode[] = "000";
   char compCode[8];
   char jmpCode[4];
@@ -266,7 +241,7 @@ char* handleC_Instruction(char* line) {
   // Stores the starting index of the computation 
   int compPtr = i;
   // Finds the last index of the computation
-  while (!isspace(line[i]) && line[i] != '\n' && line[i] != ';') {
+  while (line[i] != ';' && i - compPtr < 3) {
     comp[i - compPtr] = line[i]; 
     i++;
   }
@@ -289,7 +264,5 @@ char* handleC_Instruction(char* line) {
 
   // Assembles the C-Instruction
   sprintf(cInstruction, "111%s%s%s", compCode, destCode, jmpCode);
-
-  return cInstruction;
 }
 

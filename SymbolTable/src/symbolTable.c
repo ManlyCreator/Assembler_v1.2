@@ -32,8 +32,6 @@ void insertIntoTable(symbol* s) {
 
 void createSymbol(char* name, int value) {
   symbol* s = malloc(sizeof(symbol));
-  // name is copied and not assigned to avoid having to free
-  // memory allocations on final unload
   strcpy(s->name, name);
   s->value = value;
   s->next = NULL;
@@ -41,17 +39,13 @@ void createSymbol(char* name, int value) {
 }
 
 void initializeSymbolTable() {
+  // Initializes R<0-15> Registers
   for (int i = 0; i < 16; i++) {
-    // regNameSource is static throughout each iteration,
-    // so a dynamically allocated string is created to avoid
-    // symbol names "sticking" throughout the loop
-    char* regNameDest = malloc(4);
-    char regNameSource[4];
-    sprintf(regNameSource, "R%d", i);
-    strcpy(regNameDest, regNameSource);
-    createSymbol(regNameDest, i);
-    free(regNameDest);
+    char regName[4];
+    sprintf(regName, "R%d", i);
+    createSymbol(regName, i);
   }
+  // Initializes Misc. Registers
   createSymbol("SP", 0);
   createSymbol("LCL", 1);
   createSymbol("ARG", 2);

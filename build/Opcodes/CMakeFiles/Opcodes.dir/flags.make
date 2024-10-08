@@ -6,5 +6,5 @@ C_DEFINES =
 
 C_INCLUDES = -I/home/rami/CProjects/Assembler_v1.2/Opcodes/include
 
-C_FLAGS = 
+C_FLAGS = -g
 
