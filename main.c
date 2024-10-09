@@ -50,31 +50,27 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  char lineBuf[BUFSIZE];
   // Initializes linked list of stripped file lines
+  char lineBuf[BUFSIZE];
   node* head = malloc(sizeof(node));
   node* listPtr = head;
-  int lineCtr = 0;
   while (fgets(lineBuf, BUFSIZE, source)) {
     strip(lineBuf);
     // Skips lineBuf if it is not an instruction
     if (isspace(lineBuf[0]) || lineBuf[0] == '\n' || lineBuf[0] == '/') {
       continue;
     }
-    node* lineNode = malloc(sizeof(node));
-    strcpy(lineNode->line, lineBuf);
-    lineNode->next = NULL;
-    insertNode(listPtr, lineNode);
-    if (lineCtr > 0) {
-      listPtr = listPtr->next;
-    }
-    lineCtr++;
+    strcpy(listPtr->line, lineBuf);
+    listPtr->next = malloc(sizeof(node));
+    listPtr = listPtr->next;
   }
 
   // First pass to handle label parsing
   int instruction = 0;
   node* iterator = head;
-  while (iterator != NULL) {
+  // Final element in linked list is an empty string,
+  // so a check against strlen is made
+  while (strlen(iterator->line) > 0) {
     char* line = iterator->line;
     if (!isspace(line[0]) && line[0] != '\n' && line[0] != '/' && line[0] != '(') {
       instruction++;
@@ -93,7 +89,7 @@ int main(int argc, char** argv) {
   }
   // Second pass to handle instruction translating and variables
   iterator = head;
-  while (iterator != NULL) {
+  while (strlen(iterator->line) > 0) {
     char* line = iterator->line;
     char instruction[17];
     // Translates instructions that are not labels
@@ -103,15 +99,19 @@ int main(int argc, char** argv) {
         handleA_Instruction(line, instruction);
         fprintf(destination, "%s\n", instruction);
       } else {
-        // char* cInstruction = handleC_Instruction(line);
         handleC_Instruction(line, instruction);
         fprintf(destination, "%s\n", instruction);
       }
     }
+    // Creates a temporary pointer to be freed
+    // while iterator is moved to the next pointer
     node* iteratorCopy = iterator;
     iterator = iterator->next;
     free(iteratorCopy);
   }
+  // Final memory address in linked list can never be reached
+  // in the loop, so it is freed afterwards
+  free(iterator);
 
   fclose(source);
   fclose(destination);
@@ -125,36 +125,26 @@ void strip(char* line) {
   unsigned int len = strlen(line);
   int i = 0;
   int j = 0;
+  // Finds the final index of line containing whitespace
   while (isspace(line[i])) {
     i++;
   }
-  for (int k = i; k < len; k++) {
+  // Iterates throguh the first index containing no whitespace 
+  // to the length of line
+  for (int k = i; k < len; k++, j++) {
     temp[j] = line[k];
-    j++;
   }
-  temp[j - 1] = '\0';
-  len = strlen(temp);
-  if (len > 0 && temp[len - 1] == '\n') {
-    temp[len - 1] = '\0';
-    len--;
-  }
-  if (len > 0 && temp[len - 1] == '\r') {
-    temp[len - 1] = '\0';
-  }
-  if (strlen(temp) == 0) {
+  int tempLen = strlen(temp);
+  // If the copied string is large enough, its length - 2 is set
+  // as a null terminator to remove the carriage return and line break
+  if (tempLen > 2) {
+    temp[tempLen - 2] = '\0';
+  } else {
+    // Sets the string as a space if it is too small
     temp[0] = ' ';
     temp[1] = '\0';
   }
   strcpy(line, temp);
-}
-
-void insertNode(node* listPtr, node* n) {
-  if (listPtr->line[0] == 0) {
-    strcpy(listPtr->line, n->line);
-    listPtr->next = NULL;
-  } else {
-    listPtr->next = n;
-  }
 }
 
 void handleA_Instruction(char* line, char* aInstruction) {
