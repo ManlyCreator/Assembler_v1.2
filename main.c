@@ -16,7 +16,6 @@ typedef struct node {
 } node;
 
 void strip(char* line);
-void insertNode(node* listPtr, node* n);
 void handleA_Instruction(char* line, char* aInstruction);
 void toBinary(char* decimalString);
 void handleC_Instruction(char* line, char* cInstruction);
