@@ -1,1 +1,1 @@
-/usr/bin/cc -g CMakeFiles/Assembler.dir/main.c.o -o Assembler  Opcodes/libOpcodes.a SymbolTable/libSymbolTable.a 
+/usr/bin/cc -O3 -DNDEBUG CMakeFiles/Assembler.dir/main.c.o -o Assembler  Opcodes/libOpcodes.a SymbolTable/libSymbolTable.a 

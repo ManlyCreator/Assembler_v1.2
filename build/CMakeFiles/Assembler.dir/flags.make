@@ -6,5 +6,5 @@ C_DEFINES =
 
 C_INCLUDES = -I/home/rami/CProjects/Assembler_v1.2/Opcodes/include -I/home/rami/CProjects/Assembler_v1.2/SymbolTable/include
 
-C_FLAGS = -g
+C_FLAGS = -O3 -DNDEBUG
 

@@ -13,4 +13,6 @@ Opcodes/CMakeFiles/Opcodes.dir/src/opcodes.c.o: \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
  /usr/include/strings.h \
+ /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
+ /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
  /home/rami/CProjects/Assembler_v1.2/Opcodes/include/opcodes.h
