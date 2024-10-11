@@ -7,9 +7,6 @@
 
 #define BUFSIZE 256
 
-// TODO: Fix all memory leaks 
-// (alwyas 264 bytes, must be somewhere specific)
-
 typedef struct node {
   char line[BUFSIZE]; 
   struct node* next;
@@ -63,7 +60,6 @@ int main(int argc, char** argv) {
     listPtr->next = malloc(sizeof(node));
     listPtr = listPtr->next;
   }
-
   // First pass to handle label parsing
   int instruction = 0;
   node* iterator = head;
@@ -128,18 +124,24 @@ void strip(char* line) {
   while (isspace(line[i])) {
     i++;
   }
-  // Iterates throguh the first index containing no whitespace 
-  // to the length of line
-  for (int k = i; k < len; k++, j++) {
+  // Copies to temp through the first index of line
+  // containing no whitespace to the length of line,
+  // omitting all invalid characters
+  int k = i;
+  while (
+      j < len - i &&
+      !isspace(line[k]) && 
+      line[k] != '\r' &&
+      line[k] != '\n' &&
+      line[k] != '/'
+  ) {
     temp[j] = line[k];
+    j++;
+    k++;
   }
-  int tempLen = strlen(temp);
-  // If the copied string is large enough, its length - 2 is set
-  // as a null terminator to remove the carriage return and line break
-  if (tempLen > 2) {
-    temp[tempLen - 2] = '\0';
-  } else {
-    // Sets the string as a space if it is too small
+  temp[j] = '\0';
+  // Constructs a valid line of length 1 to avoid segmentation faults
+  if (strlen(temp) <= 1) {
     temp[0] = ' ';
     temp[1] = '\0';
   }
